@@ -1,7 +1,7 @@
 import _AntDesign from '@expo/vector-icons/AntDesign.js';
 import { Tabs } from 'expo-router';
-import { fbs, useLocaleContext } from 'fbtee';
-import { FC, useTransition } from 'react';
+import { fbs } from 'fbtee';
+import { FC } from 'react';
 import colors from 'src/ui/colors.ts';
 
 // Types in `@expo/vector-icons` do not currently work correctly in `"type": "module"` packages.
@@ -12,9 +12,6 @@ const AntDesign = _AntDesign as unknown as FC<{
 }>;
 
 export default function TabLayout() {
-  const [, startTransition] = useTransition();
-  const { locale, setLocale } = useLocaleContext();
-
   return (
     <Tabs
       screenOptions={{

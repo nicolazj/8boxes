@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ViewerContext } from 'src/user/useViewerContext.tsx';
 import ja_JP from '../translations/ja_JP.json' with { type: 'json' };
 import { VStack } from '@nkzw/stack';
+import { useDBMigrations } from 'src/db/db.ts';
 
 export const unstable_settings = {
   initialRouteName: '(app)',
@@ -26,6 +27,7 @@ const LocaleContext = createLocaleContext({
 });
 
 export default function RootLayout() {
+  useDBMigrations();
   return (
     <LocaleContext>
       <ViewerContext>

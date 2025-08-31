@@ -9,7 +9,7 @@ export default function TabLayout() {
   return (
     <Fragment key={locale}>
       <BottomSheetModalProvider>
-        <Stack>
+        <Stack screenOptions={{ initialRouteName: '(tabs)' }}>
           <Stack.Screen
             name="(tabs)"
             options={{
@@ -17,6 +17,16 @@ export default function TabLayout() {
                 backgroundColor: 'transparent',
               },
               headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="aspect/[aspectId]"
+            options={{
+              contentStyle: {
+                backgroundColor: 'transparent',
+              },
+              headerShown: false,
+              presentation: 'modal',
             }}
           />
         </Stack>

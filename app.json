@@ -20,7 +20,8 @@
       "expo-localization",
       "expo-font",
       "expo-web-browser",
-      "react-native-edge-to-edge"
+      "react-native-edge-to-edge",
+      "expo-sqlite"
     ],
     "experiments": {
       "reactCanary": true,

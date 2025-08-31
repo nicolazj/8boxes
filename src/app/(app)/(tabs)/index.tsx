@@ -1,25 +1,16 @@
 import { Stack as ExpoStack } from 'expo-router';
-import { fbs } from 'fbtee';
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  Dimensions,
-  Pressable,
-} from 'react-native';
-import Text from 'src/ui/Text.tsx';
-import { endOfWeek, getWeek, startOfWeek } from 'date-fns';
+import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { getWeek, getYear, startOfWeek, endOfWeek } from 'date-fns';
 
-const LIFE_ASPECTS = [
-  { color: '#4CAF50', emoji: '💸', id: 'transact', name: 'Transact' },
-  { color: '#2196F3', emoji: '📈', id: 'invest', name: 'Invest' },
-  { color: '#FF9800', emoji: '🤝', id: 'assist', name: 'Assist' },
-  { color: '#9C27B0', emoji: '📚', id: 'learn', name: 'Learn' },
-  { color: '#F44336', emoji: '💪', id: 'health', name: 'Health' },
-  { color: '#3F51B5', emoji: '👨‍👩‍👧‍👦', id: 'family', name: 'Family' },
-  { color: '#E91E63', emoji: '❤️', id: 'relationships', name: 'Relationships' },
-  { color: '#00BCD4', emoji: '🧘', id: 'ego', name: 'Self-Kindness' },
-];
+import Text from 'src/ui/Text.tsx';
+import { LIFE_ASPECTS, LifeAspectId } from 'src/constants.ts';
+import { toggleWeeklyBoxLog } from 'src/db/queries/weeklyBoxLog.ts';
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { db } from 'src/db/db.ts';
+import { weeklyBoxLog } from 'src/db/schema.ts';
+import { eq, and } from 'drizzle-orm';
 
 const { width } = Dimensions.get('window');
 const SIDE_PADDING = 20;
@@ -28,63 +19,113 @@ const INNER_PADDING = 16;
 const CARD_WIDTH = (width - SIDE_PADDING * 2 - INNER_PADDING) / 2;
 
 export default function Index() {
+  const router = useRouter();
   const username = 'Nick'; // TODO: Replace with actual user name from auth
-
   const now = new Date();
-
   const weekStart = startOfWeek(now, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
   const weekNumber = getWeek(now, {
     firstWeekContainsDate: 1,
     weekStartsOn: 1,
   });
-  //=> 53
+  const year = getYear(now);
+
+  // Use live query to get active logs
+  const { data: logs = [] } = useLiveQuery(
+    db
+      .select()
+      .from(weeklyBoxLog)
+      .where(
+        and(eq(weeklyBoxLog.week, weekNumber), eq(weeklyBoxLog.year, year)),
+      ),
+  );
+
+  // Create a Set of active box IDs
+  const activeBoxes = new Set<LifeAspectId>(
+    logs.map((log) => log.box as LifeAspectId),
+  );
+
+  const handleBoxPress = async (boxId: LifeAspectId) => {
+    try {
+      await toggleWeeklyBoxLog(boxId);
+      // The UI will automatically update thanks to useLiveQuery
+    } catch (error) {
+      console.error(error);
+      // Error handling without console.log
+    }
+  };
+
+  const renderAspectBox = (aspect: (typeof LIFE_ASPECTS)[number]) => {
+    const isActive = activeBoxes.has(aspect.id);
+    return (
+      <Pressable
+        key={aspect.id}
+        onPress={() => handleBoxPress(aspect.id)}
+        style={[
+          styles.aspectBox,
+          { width: CARD_WIDTH },
+          isActive && styles.aspectBoxActive,
+        ]}
+      >
+        <Text
+          style={[
+            styles.emoji,
+            { color: isActive ? '#ffffff' : aspect.color },
+            isActive && styles.emojiActive,
+          ]}
+        >
+          {aspect.emoji}
+        </Text>
+        <Text style={[styles.aspectName, isActive && styles.aspectNameActive]}>
+          {aspect.name}
+        </Text>
+        <Pressable
+          onPress={() => router.push(`/aspect/${aspect.id}`)}
+          style={styles.detailButton}
+        >
+          <Text style={styles.detailButtonText}>Details →</Text>
+        </Pressable>
+      </Pressable>
+    );
+  };
+
   return (
-    <View className="flex-1 bg-warm p-5">
+    <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ExpoStack.Screen
           options={{
-            title: String(fbs('Dashboard', 'Dashboard header title')),
+            title: String('Dashboard'),
           }}
         />
 
         {/* Greeting Section */}
         <View style={styles.header}>
-          <Text className="text-3xl font-bold">Hi, {username}!</Text>
-          <Text className="text-gray-600 mt-1">
-            {weekStart.toLocaleDateString()} - {weekEnd.toLocaleDateString()} (
-            Week#{weekNumber})
+          <Text style={styles.greeting}>Hi, {username}!</Text>
+          <Text style={styles.dateRange}>
+            {weekStart.toLocaleDateString()} - {weekEnd.toLocaleDateString()}{' '}
+            (Week#{weekNumber})
           </Text>
         </View>
 
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
-          {Array(8)
-            .fill(0)
-            .map((_, index) => (
+          {LIFE_ASPECTS.map((aspect: (typeof LIFE_ASPECTS)[number]) => {
+            const isActive = activeBoxes.has(aspect.id);
+            return (
               <View
-                key={index}
+                key={aspect.id}
                 style={[
                   styles.progressDash,
-                  index < 3 && styles.progressDashActive, // Example: first 3 segments are active
+                  isActive && styles.progressDashActive,
                 ]}
               />
-            ))}
+            );
+          })}
         </View>
 
         {/* Life Aspects Grid */}
         <View style={styles.grid}>
-          {LIFE_ASPECTS.map((aspect) => (
-            <Pressable
-              key={aspect.id}
-              style={[styles.aspectBox, { width: CARD_WIDTH }]}
-            >
-              <Text style={[styles.emoji, { color: aspect.color }]}>
-                {aspect.emoji}
-              </Text>
-              <Text style={styles.aspectName}>{aspect.name}</Text>
-            </Pressable>
-          ))}
+          {LIFE_ASPECTS.map((aspect) => renderAspectBox(aspect))}
         </View>
       </SafeAreaView>
     </View>
@@ -96,48 +137,106 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     aspectRatio: 1 / 0.618,
     backgroundColor: '#ffffff',
-    borderCurve: 'continuous',
-    borderRadius: 24,
-    elevation: 3,
+    borderRadius: 12,
+    elevation: 2,
     justifyContent: 'center',
     marginBottom: 16,
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: { height: 4, width: 0 },
+    shadowOffset: { height: 2, width: 0 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: 4,
   },
+  aspectBoxActive: {
+    backgroundColor: '#4CAF50',
+  },
+
   aspectName: {
     color: '#000000',
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 8,
     textAlign: 'center',
   },
+  aspectNameActive: {
+    color: '#ffffff',
+  },
   container: {
+    backgroundColor: '#FAF7F1',
     flex: 1,
+    padding: 20,
+  },
+  contentContainer: {
     padding: 16,
+  },
+  dateRange: {
+    color: '#000000',
+    fontSize: 16,
+    marginBottom: 24,
+    opacity: 0.7,
+  },
+  detailButton: {
+    alignItems: 'center',
+    marginTop: 8,
+    padding: 8,
+  },
+  detailButtonText: {
+    color: '#666',
+    fontSize: 12,
+    fontWeight: '500',
   },
   emoji: {
     fontSize: 32,
     marginBottom: 8,
     textAlign: 'center',
   },
+
+  emojiActive: {
+    color: '#ffffff',
+  },
+  greeting: {
+    color: '#000000',
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 24,
   },
   header: {
     marginBottom: 16,
     paddingHorizontal: 8,
   },
-  progressContainer: {
+
+  pressed: {
+    opacity: 0.8,
+  },
+  progressBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 8,
+  },
+
+  progressBarFill: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 6,
+    height: '100%',
+  },
+  progressBarTrack: {
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+    height: 12,
+    marginTop: 8,
+    overflow: 'hidden',
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    marginBottom: 32,
     width: '100%',
   },
+
   progressDash: {
     backgroundColor: '#e0e0e0',
     borderRadius: 2,
@@ -146,7 +245,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   progressDashActive: {
-    backgroundColor: '#ffe399', // Dark yellow color for active segments
+    backgroundColor: '#ffe399',
+  },
+  progressText: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: '500',
   },
   safeArea: {
     flex: 1,
