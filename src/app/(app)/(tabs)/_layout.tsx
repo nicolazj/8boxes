@@ -1,11 +1,9 @@
-import _AntDesign from '@expo/vector-icons/AntDesign.js';
 import { Tabs } from 'expo-router';
-import { fbs } from 'fbtee';
 import { FC } from 'react';
 import colors from 'src/ui/colors.ts';
-
+import _FontAwesome from '@expo/vector-icons/FontAwesome.js';
 // Types in `@expo/vector-icons` do not currently work correctly in `"type": "module"` packages.
-const AntDesign = _AntDesign as unknown as FC<{
+const FontAwesome = _FontAwesome as unknown as FC<{
   color: string;
   name: string;
   size: number;
@@ -15,37 +13,63 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
+        headerShown: false,
         sceneStyle: {
           backgroundColor: 'transparent',
         },
-        tabBarActiveTintColor: colors.purple,
+
+        tabBarActiveTintColor: colors.black,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          headerShown: false,
           tabBarIcon: ({ focused }: { focused: boolean }) => (
-            <AntDesign
-              color={focused ? colors.purple : colors.black}
-              name="ie"
+            <FontAwesome
+              color={focused ? colors.black : colors.grey}
+              name="dropbox"
               size={24}
             />
           ),
-          title: String(fbs('Home', 'Home tab title')),
+          tabBarLabelStyle: {
+            fontSize: 12,
+            marginBottom: 4,
+          },
+          title: '8 boxes',
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="notes"
         options={{
           tabBarIcon: ({ focused }: { focused: boolean }) => (
-            <AntDesign
-              color={focused ? colors.purple : colors.black}
-              name="printer"
+            <FontAwesome
+              color={focused ? colors.black : colors.grey}
+              name="sticky-note"
               size={24}
             />
           ),
-          title: String(fbs('Two', 'Two tab title')),
+          tabBarLabelStyle: {
+            fontSize: 12,
+            marginBottom: 4,
+          },
+          title: 'Notes',
+        }}
+      />
+      <Tabs.Screen
+        name="insights"
+        options={{
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
+            <FontAwesome
+              color={focused ? colors.black : colors.grey}
+              name="signal"
+              size={24}
+            />
+          ),
+          tabBarLabelStyle: {
+            fontSize: 12,
+            marginBottom: 4,
+          },
+          title: 'Insights',
         }}
       />
     </Tabs>

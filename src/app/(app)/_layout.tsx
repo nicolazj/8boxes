@@ -1,22 +1,21 @@
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Stack } from 'expo-router';
-import { useLocaleContext } from 'fbtee';
 import { Fragment } from 'react/jsx-runtime';
 
 export default function TabLayout() {
-  const { locale } = useLocaleContext();
-
+  console.log('tab layout');
   return (
-    <Fragment key={locale}>
+    <Fragment>
       <BottomSheetModalProvider>
-        <Stack screenOptions={{ initialRouteName: '(tabs)' }}>
+        <Stack
+          screenOptions={{ headerShown: false, initialRouteName: '(tabs)' }}
+        >
           <Stack.Screen
             name="(tabs)"
             options={{
               contentStyle: {
                 backgroundColor: 'transparent',
               },
-              headerShown: false,
             }}
           />
           <Stack.Screen
@@ -25,8 +24,22 @@ export default function TabLayout() {
               contentStyle: {
                 backgroundColor: 'transparent',
               },
-              headerShown: false,
               presentation: 'modal',
+            }}
+          />
+          <Stack.Screen
+            name="note/[aspectId]"
+            options={{
+              contentStyle: {
+                backgroundColor: 'transparent',
+              },
+              presentation: 'modal',
+            }}
+          />
+          <Stack.Screen
+            name="onboarding"
+            options={{
+              animation: 'none',
             }}
           />
         </Stack>

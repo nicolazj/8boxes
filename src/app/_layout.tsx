@@ -4,13 +4,17 @@ import { Slot } from 'expo-router';
 import { createLocaleContext } from 'fbtee';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ViewerContext } from 'src/user/useViewerContext.tsx';
-import ja_JP from '../translations/ja_JP.json' with { type: 'json' };
+import ja_JP from '../translations/ja_JP.json';
 import { VStack } from '@nkzw/stack';
 import { useDBMigrations } from 'src/db/db.ts';
+import { setOptions, preventAutoHideAsync } from 'expo-splash-screen';
 
-export const unstable_settings = {
-  initialRouteName: '(app)',
-};
+setOptions({
+  duration: 1000,
+  fade: true,
+});
+
+preventAutoHideAsync();
 
 const LocaleContext = createLocaleContext({
   availableLanguages: new Map([
@@ -28,6 +32,7 @@ const LocaleContext = createLocaleContext({
 
 export default function RootLayout() {
   useDBMigrations();
+
   return (
     <LocaleContext>
       <ViewerContext>

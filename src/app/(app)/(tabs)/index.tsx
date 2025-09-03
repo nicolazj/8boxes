@@ -1,26 +1,25 @@
-import { Stack as ExpoStack } from 'expo-router';
 import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useUserStore } from 'src/store';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getWeek, getYear, startOfWeek, endOfWeek } from 'date-fns';
 
 import Text from 'src/ui/Text.tsx';
 import { LIFE_ASPECTS, LifeAspectId } from 'src/constants.ts';
-import { toggleWeeklyBoxLog } from 'src/db/queries/weeklyBoxLog.ts';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { db } from 'src/db/db.ts';
 import { weeklyBoxLog } from 'src/db/schema.ts';
 import { eq, and } from 'drizzle-orm';
+import { useState } from 'react';
 
 const { width } = Dimensions.get('window');
 const SIDE_PADDING = 20;
 const INNER_PADDING = 16;
 
 const CARD_WIDTH = (width - SIDE_PADDING * 2 - INNER_PADDING) / 2;
-
 export default function Index() {
   const router = useRouter();
-  const username = 'Nick'; // TODO: Replace with actual user name from auth
+  const { name: username } = useUserStore();
   const now = new Date();
   const weekStart = startOfWeek(now, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
@@ -30,6 +29,7 @@ export default function Index() {
   });
   const year = getYear(now);
 
+  const [canClick, setCanClick] = useState(false);
   // Use live query to get active logs
   const { data: logs = [] } = useLiveQuery(
     db
@@ -45,22 +45,23 @@ export default function Index() {
     logs.map((log) => log.box as LifeAspectId),
   );
 
-  const handleBoxPress = async (boxId: LifeAspectId) => {
-    try {
-      await toggleWeeklyBoxLog(boxId);
-      // The UI will automatically update thanks to useLiveQuery
-    } catch (error) {
-      console.error(error);
-      // Error handling without console.log
-    }
-  };
+  useFocusEffect(() => {
+    setCanClick(true);
+    return () => {
+      setCanClick(false);
+    };
+  });
 
   const renderAspectBox = (aspect: (typeof LIFE_ASPECTS)[number]) => {
     const isActive = activeBoxes.has(aspect.id);
     return (
       <Pressable
         key={aspect.id}
-        onPress={() => handleBoxPress(aspect.id)}
+        onPress={() => {
+          if (canClick) {
+            router.push(`/aspect/${aspect.id}`);
+          }
+        }}
         style={[
           styles.aspectBox,
           { width: CARD_WIDTH },
@@ -79,25 +80,13 @@ export default function Index() {
         <Text style={[styles.aspectName, isActive && styles.aspectNameActive]}>
           {aspect.name}
         </Text>
-        <Pressable
-          onPress={() => router.push(`/aspect/${aspect.id}`)}
-          style={styles.detailButton}
-        >
-          <Text style={styles.detailButtonText}>Details →</Text>
-        </Pressable>
       </Pressable>
     );
   };
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ExpoStack.Screen
-          options={{
-            title: String('Dashboard'),
-          }}
-        />
-
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
         {/* Greeting Section */}
         <View style={styles.header}>
           <Text style={styles.greeting}>Hi, {username}!</Text>
@@ -127,8 +116,8 @@ export default function Index() {
         <View style={styles.grid}>
           {LIFE_ASPECTS.map((aspect) => renderAspectBox(aspect))}
         </View>
-      </SafeAreaView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -141,6 +130,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     justifyContent: 'center',
     marginBottom: 16,
+    opacity: 0.5,
     padding: 16,
     shadowColor: '#000',
     shadowOffset: { height: 2, width: 0 },
@@ -148,7 +138,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   aspectBoxActive: {
-    backgroundColor: '#4CAF50',
+    // backgroundColor: '#4CAF50',
+    opacity: 1,
   },
 
   aspectName: {
@@ -159,10 +150,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   aspectNameActive: {
-    color: '#ffffff',
+    // color: '#ffffff',
   },
   container: {
-    backgroundColor: '#FAF7F1',
     flex: 1,
     padding: 20,
   },
@@ -253,6 +243,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   safeArea: {
+    backgroundColor: '#FAF7F1',
     flex: 1,
   },
 });

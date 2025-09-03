@@ -15,6 +15,13 @@
       "when": 1756674123166,
       "tag": "0001_sloppy_tombstone",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1756693642333,
+      "tag": "0002_dizzy_hobgoblin",
+      "breakpoints": true
     }
   ]
 }
