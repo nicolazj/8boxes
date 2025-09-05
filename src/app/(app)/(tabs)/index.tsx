@@ -11,6 +11,7 @@ import { db } from 'src/db/db.ts';
 import { weeklyBoxLog } from 'src/db/schema.ts';
 import { eq, and } from 'drizzle-orm';
 import { useState } from 'react';
+import { NotificationSetup } from 'src/components/notification.tsx';
 
 const { width } = Dimensions.get('window');
 const SIDE_PADDING = 20;
@@ -68,15 +69,14 @@ export default function Index() {
           isActive && styles.aspectBoxActive,
         ]}
       >
-        <Text
+        <View
           style={[
-            styles.emoji,
-            { color: isActive ? '#ffffff' : aspect.color },
-            isActive && styles.emojiActive,
+            styles.emojiContainer,
+            { backgroundColor: isActive ? aspect.color : '#f0f0f0' },
           ]}
         >
-          {aspect.emoji}
-        </Text>
+          <Text style={styles.emoji}>{aspect.emoji}</Text>
+        </View>
         <Text style={[styles.aspectName, isActive && styles.aspectNameActive]}>
           {aspect.name}
         </Text>
@@ -86,6 +86,7 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <NotificationSetup />
       <View style={styles.container}>
         {/* Greeting Section */}
         <View style={styles.header}>
@@ -94,22 +95,6 @@ export default function Index() {
             {weekStart.toLocaleDateString()} - {weekEnd.toLocaleDateString()}{' '}
             (Week#{weekNumber})
           </Text>
-        </View>
-
-        {/* Progress Bar */}
-        <View style={styles.progressContainer}>
-          {LIFE_ASPECTS.map((aspect: (typeof LIFE_ASPECTS)[number]) => {
-            const isActive = activeBoxes.has(aspect.id);
-            return (
-              <View
-                key={aspect.id}
-                style={[
-                  styles.progressDash,
-                  isActive && styles.progressDashActive,
-                ]}
-              />
-            );
-          })}
         </View>
 
         {/* Life Aspects Grid */}
@@ -161,9 +146,9 @@ const styles = StyleSheet.create({
   },
   dateRange: {
     color: '#000000',
-    fontSize: 16,
-    marginBottom: 24,
+    fontSize: 12,
     opacity: 0.7,
+    textAlign: 'center',
   },
   detailButton: {
     alignItems: 'center',
@@ -175,20 +160,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
   },
-  emoji: {
-    fontSize: 32,
-    marginBottom: 8,
-    textAlign: 'center',
+  emojiContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+    backgroundColor: '#f0f0f0',
+    opacity: 0.8,
   },
-
-  emojiActive: {
-    color: '#ffffff',
+  emoji: {
+    fontSize: 28,
+    textAlign: 'center',
   },
   greeting: {
     color: '#000000',
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 32,
   },
   grid: {
     flexDirection: 'row',

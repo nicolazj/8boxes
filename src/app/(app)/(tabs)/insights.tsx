@@ -5,6 +5,7 @@ import { weeklyBoxLog } from 'src/db/schema.ts';
 import { LIFE_ASPECTS } from 'src/constants.ts';
 import Text from 'src/ui/Text.tsx';
 import { ScrollView } from 'react-native-gesture-handler';
+import { EmptyState } from 'src/components/EmptyState';
 
 export default function InsightsScreen() {
   const { data: allLogs = [] } = useLiveQuery(
@@ -77,104 +78,97 @@ export default function InsightsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>Your Life Insights</Text>
+      {totalLogs > 0 ? (
+        <ScrollView style={styles.scrollView} contentContainerStyle={{}}>
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>Your Life Insights</Text>
+            {/* Life Balance */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Weekly Logs Overview</Text>
+              {aspectData.map((aspect, index) => (
+                <View key={aspect.id} style={styles.aspectRow}>
+                  <View style={styles.aspectHeader}>
+                    <Text style={[styles.aspectName, { color: aspect.color }]}>
+                      {aspect.emoji} {aspect.name}
+                    </Text>
+                    <Text style={styles.aspectCount}>{aspect.count} logs</Text>
+                  </View>
+                  <View style={styles.progressBarContainer}>
+                    <View
+                      style={[
+                        styles.progressBar,
+                        {
+                          backgroundColor: aspect.color,
+                          opacity: 0.7,
+                          width: `${Math.min(aspect.percentage * 2, 100)}%`,
+                        },
+                      ]}
+                    />
+                  </View>
+                  <Text style={styles.lastUpdated}>
+                    Last updated: {aspect.lastUpdated}
+                  </Text>
+                </View>
+              ))}
+            </View>
 
-          {totalLogs > 0 ? (
-            <>
-              {/* Life Balance */}
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Weekly Logs Overview</Text>
-                {aspectData.map((aspect, index) => (
-                  <View key={aspect.id} style={styles.aspectRow}>
-                    <View style={styles.aspectHeader}>
-                      <Text
-                        style={[styles.aspectName, { color: aspect.color }]}
-                      >
-                        {aspect.emoji} {aspect.name}
+            {/* Activity Insights */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Activity Insights</Text>
+              <View style={styles.insightCard}>
+                <View style={styles.insightItem}>
+                  <Text style={styles.insightEmoji}>📅</Text>
+                  <View>
+                    <Text style={styles.insightText}>
+                      Most active week:{' '}
+                      <Text style={styles.highlight}>
+                        {getMostActiveWeek()}
                       </Text>
-                      <Text style={styles.aspectCount}>
-                        {aspect.count} logs
-                      </Text>
-                    </View>
-                    <View style={styles.progressBarContainer}>
-                      <View
-                        style={[
-                          styles.progressBar,
-                          {
-                            backgroundColor: aspect.color,
-                            opacity: 0.7,
-                            width: `${Math.min(aspect.percentage * 2, 100)}%`,
-                          },
-                        ]}
-                      />
-                    </View>
-                    <Text style={styles.lastUpdated}>
-                      Last updated: {aspect.lastUpdated}
                     </Text>
                   </View>
-                ))}
-              </View>
+                </View>
 
-              {/* Activity Insights */}
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Activity Insights</Text>
-                <View style={styles.insightCard}>
-                  <View style={styles.insightItem}>
-                    <Text style={styles.insightEmoji}>📅</Text>
-                    <View>
-                      <Text style={styles.insightText}>
-                        Most active week:{' '}
-                        <Text style={styles.highlight}>
-                          {getMostActiveWeek()}
-                        </Text>
+                <View style={styles.insightItem}>
+                  <Text style={styles.insightEmoji}>📊</Text>
+                  <View>
+                    <Text style={styles.insightText}>
+                      <Text style={styles.highlight}>{totalLogs}</Text> total
+                      logs across {weeksTracked} weeks
+                    </Text>
+                    <Text style={[styles.insightText, { marginTop: 4 }]}>
+                      Average:{' '}
+                      <Text style={styles.highlight}>
+                        {averageLogsPerWeek} logs/week
                       </Text>
-                    </View>
+                    </Text>
                   </View>
+                </View>
 
-                  <View style={styles.insightItem}>
-                    <Text style={styles.insightEmoji}>📊</Text>
-                    <View>
-                      <Text style={styles.insightText}>
-                        <Text style={styles.highlight}>{totalLogs}</Text> total
-                        logs across {weeksTracked} weeks
-                      </Text>
-                      <Text style={[styles.insightText, { marginTop: 4 }]}>
-                        Average:{' '}
-                        <Text style={styles.highlight}>
-                          {averageLogsPerWeek} logs/week
-                        </Text>
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.insightItem}>
-                    <Text style={styles.insightEmoji}>🏆</Text>
-                    <View>
-                      <Text style={styles.insightText}>
-                        <Text style={styles.highlight}>
-                          {mostActiveAspect?.name || 'No aspect'}
-                        </Text>{' '}
-                        is your most tracked area
-                      </Text>
-                    </View>
+                <View style={styles.insightItem}>
+                  <Text style={styles.insightEmoji}>🏆</Text>
+                  <View>
+                    <Text style={styles.insightText}>
+                      <Text style={styles.highlight}>
+                        {mostActiveAspect?.name || 'No aspect'}
+                      </Text>{' '}
+                      is your most tracked area
+                    </Text>
                   </View>
                 </View>
               </View>
-            </>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>📊</Text>
-              <Text style={styles.emptyTitle}>No Data Yet</Text>
-              <Text style={styles.emptyText}>
-                Start adding notes to see your personal insights and track your
-                progress across different life aspects.
-              </Text>
             </View>
-          )}
+          </View>
+        </ScrollView>
+      ) : (
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>Your Life Insights</Text>
+          <EmptyState
+            icon="bar-chart-2"
+            title="No Data Yet"
+            description="Start tracking your life aspects to see personalized insights and visualize your progress over time."
+          />
         </View>
-      </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
@@ -202,7 +196,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    padding: 16,
+    padding: 20,
   },
   emptyEmoji: {
     fontSize: 48,

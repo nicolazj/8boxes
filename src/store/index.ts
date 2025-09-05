@@ -9,7 +9,7 @@ type UserStore = {
   setOnboarded: (onboarded: boolean) => void;
 };
 
-AsyncStorage.clear();
+// AsyncStorage.clear();
 export const useUserStore = create<UserStore>()(
   persist(
     (set) => ({

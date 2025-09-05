@@ -35,7 +35,24 @@ export default function TabLayout() {
             fontSize: 12,
             marginBottom: 4,
           },
-          title: '8 boxes',
+          title: 'Life',
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
+            <FontAwesome
+              color={focused ? colors.black : colors.grey}
+              name="history"
+              size={24}
+            />
+          ),
+          tabBarLabelStyle: {
+            fontSize: 12,
+            marginBottom: 4,
+          },
+          title: 'History',
         }}
       />
       <Tabs.Screen

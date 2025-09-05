@@ -31,6 +31,9 @@ importers:
       '@nkzw/stack':
         specifier: ^2.2.0
         version: 2.2.0(nativewind@4.1.23(react-native-reanimated@4.0.2(@babel/core@7.28.3)(react-native-worklets@0.4.2(@babel/core@7.28.3)(react-native@0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1))(react@19.1.1))(react-native@0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1))(react@19.1.1))(react-native-safe-area-context@5.6.1(react-native@0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1))(react@19.1.1))(react-native-svg@15.12.1(react-native@0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1))(react@19.1.1))(react-native@0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1))(react@19.1.1)(tailwindcss@3.4.17))(react-native@0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1))(react@19.1.1)
+      '@notifee/react-native':
+        specifier: ^9.1.8
+        version: 9.1.8(react-native@0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1))
       '@react-native-async-storage/async-storage':
         specifier: ^2.2.0
         version: 2.2.0(react-native@0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1))
@@ -1568,6 +1571,11 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@notifee/react-native@9.1.8':
+    resolution: {integrity: sha512-Az/dueoPerJsbbjRxu8a558wKY+gONUrfoy3Hs++5OqbeMsR0dYe6P+4oN6twrLFyzAhEA1tEoZRvQTFDRmvQg==}
+    peerDependencies:
+      react-native: '*'
 
   '@oxc-parser/binding-android-arm64@0.74.0':
     resolution: {integrity: sha512-lgq8TJq22eyfojfa2jBFy2m66ckAo7iNRYDdyn9reXYA3I6Wx7tgGWVx1JAp1lO+aUiqdqP/uPlDaETL9tqRcg==}
@@ -7619,6 +7627,10 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
+
+  '@notifee/react-native@9.1.8(react-native@0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1))':
+    dependencies:
+      react-native: 0.79.4(@babel/core@7.28.3)(@types/react@19.1.11)(react@19.1.1)
 
   '@oxc-parser/binding-android-arm64@0.74.0':
     optional: true

@@ -14,6 +14,7 @@ import { notes } from 'src/db/schema.ts';
 import { LIFE_ASPECTS } from 'src/constants.ts';
 import Text from 'src/ui/Text.tsx';
 import { formatDistanceToNow } from 'date-fns';
+import { EmptyState } from 'src/components/EmptyState';
 
 interface NoteItemProps {
   box: string;
@@ -65,21 +66,19 @@ export default function NotesScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Your Notes</Text>
-        {sortedNotes.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Feather color="#ccc" name="file-text" size={48} />
-            <Text style={styles.emptyText}>No notes yet</Text>
-            <Text style={styles.emptySubtext}>
-              Add notes to track your progress
-            </Text>
-          </View>
-        ) : (
+        {sortedNotes.length > 0 ? (
           <FlatList
             contentContainerStyle={styles.listContent}
             data={sortedNotes}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => <NoteItem note={item} />}
             showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <EmptyState
+            icon="file-text"
+            title="No Notes Yet"
+            description="Add notes to track your progress and reflections across different life aspects."
           />
         )}
       </View>
@@ -107,24 +106,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  emptyState: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    padding: 40,
-  },
-  emptySubtext: {
-    color: '#999',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  emptyText: {
-    color: '#666',
-    fontSize: 18,
-    fontWeight: '500',
-    marginBottom: 8,
-    marginTop: 16,
-  },
+  // Empty state styles removed - using EmptyState component instead
   listContent: {
     paddingBottom: 20,
   },
@@ -156,8 +138,8 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#333',
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 24,
   },
 });

@@ -47,24 +47,10 @@ export default function AspectDetailScreen() {
     (aspect: { id: string }) => aspect.id === aspectId,
   );
 
-  // Helper function to get tips for each aspect
+  // Get the description for the current aspect
   const getAspectTips = (aspectId: LifeAspectId): string => {
-    const tips: Record<LifeAspectId, string> = {
-      assist: 'Help others in your community or support causes you care about.',
-      ego: 'Practice self-reflection and personal growth.',
-      family:
-        'Spend quality time with your family and strengthen your relationships.',
-      health:
-        'Focus on physical and mental well-being through exercise and self-care.',
-      invest:
-        'Review your investments and consider rebalancing your portfolio.',
-      learn: 'Dedicate time to learn something new or improve your skills.',
-      relationships:
-        'Nurture your personal relationships and social connections.',
-      transact:
-        'Track your financial transactions and set weekly spending goals.',
-    };
-    return tips[aspectId] || 'No specific tips available for this aspect.';
+    const aspect = LIFE_ASPECTS.find((aspect) => aspect.id === aspectId);
+    return aspect?.description || 'No description available for this aspect.';
   };
 
   if (!currentAspect) {

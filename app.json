@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "NKZW App",
-    "slug": "nkzw-app",
+    "name": "babox",
+    "slug": "babox",
     "version": "1.0.0",
-    "scheme": "nkzw-app",
+    "scheme": "babox",
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -43,7 +43,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.nkzw.www",
+      "bundleIdentifier": "babox.nicolazj.www",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -53,7 +53,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.nkzw.www"
+      "package": "babox.nicolazj.www"
     },
     "newArchEnabled": true,
     "extra": {
